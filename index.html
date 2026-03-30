@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pumpolino</title>
+  <meta name="description" content="Precision, applied." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      background: #ffffff;
+      color: #111;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: #ffffff;
+      background-image:
+        repeating-linear-gradient(
+          0deg,
+          transparent, transparent 5px,
+          rgba(180,170,150,0.07) 5px, rgba(180,170,150,0.07) 6px
+        ),
+        repeating-linear-gradient(
+          90deg,
+          transparent, transparent 5px,
+          rgba(180,170,150,0.055) 5px, rgba(180,170,150,0.055) 6px
+        );
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Mondrian accents ── */
+    .accent-red {
+      position: fixed; left: 0; top: 0;
+      width: 5px; height: 100%;
+      background: #c0392b; z-index: 100;
+    }
+    .accent-blue {
+      position: fixed; top: 0; right: 72px;
+      width: 5px; height: 72px;
+      background: #1a4fa8; z-index: 100;
+    }
+    .accent-yellow {
+      position: fixed; bottom: 0; right: 0;
+      width: 72px; height: 48px;
+      background: #d4a017; z-index: 100;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: relative; z-index: 10;
+      border-bottom: 2px solid #111;
+      padding: 28px 52px 24px 52px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .logo { display: flex; flex-direction: column; gap: 2px; text-decoration: none; }
+    .logo-word {
+      font-size: clamp(28px, 5vw, 42px);
+      font-weight: 700; letter-spacing: -0.04em;
+      color: #111; line-height: 1; text-transform: lowercase;
+    }
+    .logo-word em { font-style: normal; font-weight: 700; color: #c8973a; }
+    .logo-domain {
+      font-size: 9px; letter-spacing: 0.22em;
+      color: #bbb; font-weight: 300; text-transform: lowercase;
+      padding-left: 2px; margin-top: 4px;
+    }
+    .header-tagline {
+      font-size: 9px; letter-spacing: 0.32em;
+      text-transform: uppercase; color: #bbb;
+      font-weight: 300; text-align: right; line-height: 1.6;
+    }
+
+    /* ── Panels ── */
+    .panels {
+      position: relative; z-index: 10;
+      display: grid;
+      grid-template-columns: 1fr 2px 1fr;
+      flex: 1; align-items: stretch;
+      transition: grid-template-columns 0.55s cubic-bezier(0.77,0,0.18,1);
+      min-height: 420px;
+    }
+
+    .divider {
+      background: #111; width: 2px;
+      transition: opacity 0.4s ease;
+    }
+
+    .panel {
+      padding: 56px 52px 52px 52px;
+      display: flex; flex-direction: column;
+      cursor: pointer;
+      transition: background 0.3s, opacity 0.4s;
+      overflow: hidden;
+    }
+    .panel:hover { background: rgba(245,242,232,0.65); }
+
+    .panel-accent { width: 28px; height: 3px; margin-bottom: 36px; flex-shrink: 0; }
+    .panel-accent.blue { background: #1a4fa8; }
+    .panel-accent.red  { background: #c0392b; }
+
+    .panel-title {
+      font-size: clamp(28px, 4vw, 38px);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: #111; line-height: 1.05; text-transform: lowercase;
+      height: 84px; display: flex; align-items: flex-start;
+      margin-bottom: 6px; flex-shrink: 0;
+    }
+    .panel-subtitle {
+      font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: #aaa; font-weight: 300;
+      height: 32px; display: flex; align-items: flex-start;
+      margin-bottom: 40px; flex-shrink: 0;
+    }
+    .panel-body {
+      font-size: 13px; line-height: 1.7;
+      color: #aaa; font-weight: 300; font-style: italic; flex-shrink: 0;
+    }
+    .panel-body strong { font-weight: 300; font-style: normal; color: #111; }
+
+    .spacer { flex: 1; }
+
+    .panel-enter {
+      font-size: 9px; letter-spacing: 0.38em;
+      text-transform: uppercase; color: #ccc; font-weight: 300;
+      transition: color 0.25s, letter-spacing 0.3s;
+      margin-top: 48px; flex-shrink: 0;
+    }
+    .panel:hover .panel-enter { color: #111; letter-spacing: 0.5em; }
+
+    /* ── Expanded state ── */
+    .panels.expanded-1 { grid-template-columns: 1fr 2px 0fr; }
+    .panels.expanded-2 { grid-template-columns: 0fr 2px 1fr; }
+
+    .panels.expanded-1 .panel-2,
+    .panels.expanded-2 .panel-1 { opacity: 0; pointer-events: none; padding: 0; }
+
+    .panels.expanded-1 .divider,
+    .panels.expanded-2 .divider { opacity: 0; }
+
+    .panels.expanded-1 .panel-1,
+    .panels.expanded-2 .panel-2 { cursor: default; }
+
+    .panels.expanded-1 .panel-1:hover,
+    .panels.expanded-2 .panel-2:hover { background: transparent; }
+
+    .panels.expanded-1 .panel-1 .collapsed,
+    .panels.expanded-2 .panel-2 .collapsed { display: none; }
+
+    /* ── Expanded inner layout ── */
+    .expanded-inner { display: none; flex-direction: column; flex: 1; }
+    .panels.expanded-1 .panel-1 .expanded-inner,
+    .panels.expanded-2 .panel-2 .expanded-inner { display: flex; }
+
+    .title-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 52px; align-items: start; flex: 1;
+    }
+
+    .expanded-title {
+      font-size: clamp(36px, 5vw, 56px);
+      font-weight: 700; letter-spacing: -0.04em;
+      color: #111; line-height: 1; text-transform: lowercase; margin-bottom: 12px;
+    }
+    .expanded-subtitle {
+      font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: #aaa; font-weight: 300;
+    }
+
+    .text-right {
+      padding-top: 6px; opacity: 0; transform: translateY(10px);
+      transition: opacity 0.5s ease 0.25s, transform 0.5s ease 0.25s;
+    }
+    .panels.expanded-1 .panel-1 .text-right,
+    .panels.expanded-2 .panel-2 .text-right { opacity: 1; transform: translateY(0); }
+
+    .text-intro {
+      font-size: 13px; line-height: 1.7;
+      color: #aaa; font-weight: 300; font-style: italic; margin-bottom: 24px;
+    }
+    .text-intro strong { font-weight: 300; font-style: normal; color: #111; }
+
+    .text-full { font-size: 13px; line-height: 1.95; color: #666; font-weight: 300; }
+
+    .btn-back {
+      font-size: 9px; letter-spacing: 0.32em;
+      text-transform: uppercase; color: #bbb; font-weight: 300;
+      cursor: pointer; margin-top: 52px; display: none;
+      transition: color 0.2s; align-self: flex-start;
+      background: none; border: none; padding: 0; font-family: inherit;
+    }
+    .btn-back:hover { color: #111; }
+    .panels.expanded-1 .panel-1 .btn-back,
+    .panels.expanded-2 .panel-2 .btn-back { display: block; }
+
+    /* ── Footer ── */
+    .site-footer {
+      position: relative; z-index: 10;
+      border-top: 2px solid #111;
+      padding: 14px 52px;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-shrink: 0; margin-bottom: 48px;
+    }
+    .footer-left {
+      font-size: 9px; letter-spacing: 0.28em;
+      color: #bbb; font-weight: 300; text-transform: lowercase;
+    }
+    .footer-right {
+      font-size: 9px; letter-spacing: 0.2em; color: #ccc; font-weight: 300;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 680px) {
+      .site-header { padding: 20px 24px 18px 24px; }
+      .panel { padding: 36px 24px 36px 24px; }
+      .panels {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 2px auto;
+        min-height: auto;
+      }
+      .divider { width: 100%; height: 2px; }
+      .panels.expanded-1,
+      .panels.expanded-2 { grid-template-columns: 1fr; grid-template-rows: auto; }
+      .panels.expanded-1 .panel-2,
+      .panels.expanded-2 .panel-1 { display: none; }
+      .panels.expanded-1 .divider,
+      .panels.expanded-2 .divider { display: none; }
+      .title-row { grid-template-columns: 1fr; gap: 24px; }
+      .site-footer { padding: 14px 24px; margin-bottom: 48px; }
+      .accent-blue { display: none; }
+      .panel-title { height: auto; margin-bottom: 8px; }
+      .panel-subtitle { height: auto; margin-bottom: 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="accent-red"></div>
+  <div class="accent-blue"></div>
+  <div class="accent-yellow"></div>
+
+  <header class="site-header">
+    <a class="logo" href="/">
+      <div class="logo-word">pump<em>o</em>lino</div>
+      <div class="logo-domain">pumpolino.com</div>
+    </a>
+    <div class="header-tagline">Precision,<br>applied.</div>
+  </header>
+
+  <main class="panels" id="panels">
+
+    <!-- Panel 1 -->
+    <div class="panel panel-1" onclick="expand(1)" role="button" tabindex="0" aria-label="Open Process and Intelligence">
+      <div class="collapsed">
+        <div class="panel-accent blue"></div>
+        <div class="panel-title">Process &amp;<br>Intelligence</div>
+        <div class="panel-subtitle">Consulting · Data · AI</div>
+        <div class="panel-body">We work where <strong>complexity asks for calm.</strong></div>
+      </div>
+      <div class="spacer"></div>
+      <span class="panel-enter collapsed">Enter →</span>
+
+      <div class="expanded-inner">
+        <div class="panel-accent blue"></div>
+        <div class="title-row">
+          <div>
+            <div class="expanded-title">Process &amp;<br>Intelligence</div>
+            <div class="expanded-subtitle">Consulting · Data · AI</div>
+          </div>
+          <div class="text-right">
+            <div class="text-intro">We work where <strong>complexity asks for calm.</strong></div>
+            <div class="text-full">
+              Systems that move — water, information, decisions.<br><br>
+              Pumolino brings deep technical fluency to industrial process consulting, paired with the clarity of modern data architecture and applied intelligence.
+            </div>
+          </div>
+        </div>
+        <button class="btn-back" onclick="collapse(event)">← Back</button>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- Panel 2 -->
+    <div class="panel panel-2" onclick="expand(2)" role="button" tabindex="0" aria-label="Open Art and Provenance">
+      <div class="collapsed">
+        <div class="panel-accent red"></div>
+        <div class="panel-title">Art &amp;<br>Provenance</div>
+        <div class="panel-subtitle">Museums · Collections · Exhibition</div>
+        <div class="panel-body">We work where <strong>meaning asks for discretion.</strong></div>
+      </div>
+      <div class="spacer"></div>
+      <span class="panel-enter collapsed">Enter →</span>
+
+      <div class="expanded-inner">
+        <div class="panel-accent red"></div>
+        <div class="title-row">
+          <div>
+            <div class="expanded-title">Art &amp;<br>Provenance</div>
+            <div class="expanded-subtitle">Museums · Collections · Exhibition</div>
+          </div>
+          <div class="text-right">
+            <div class="text-intro">We work where <strong>meaning asks for discretion.</strong></div>
+            <div class="text-full">
+              Objects of significance, handled with patience.<br><br>
+              Pumolino accompanies works of art through the careful architecture of acquisition, placement, and exhibition — in dialogue with museums, foundations, and private collections.
+            </div>
+          </div>
+        </div>
+        <button class="btn-back" onclick="collapse(event)">← Back</button>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="site-footer">
+    <span class="footer-left">by appointment</span>
+    <span class="footer-right">pumpolino.com</span>
+  </footer>
+
+  <script>
+    var current = 0;
+
+    function expand(n) {
+      if (current === n) return;
+      current = n;
+      document.getElementById('panels').className = 'panels expanded-' + n;
+    }
+
+    function collapse(e) {
+      e.stopPropagation();
+      current = 0;
+      document.getElementById('panels').className = 'panels';
+    }
+
+    document.querySelectorAll('.panel').forEach(function(panel) {
+      panel.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          panel.click();
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
