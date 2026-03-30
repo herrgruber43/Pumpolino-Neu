@@ -78,7 +78,9 @@
       font-weight: 300; text-align: right; line-height: 1.6;
     }
 
-    /* ── Panels ── */
+    /* ══════════════════════════════════════
+       TOP-LEVEL PANELS  (same as original)
+    ══════════════════════════════════════ */
     .panels {
       position: relative; z-index: 10;
       display: grid;
@@ -135,7 +137,7 @@
     }
     .panel:hover .panel-enter { color: #111; letter-spacing: 0.5em; }
 
-    /* ── Expanded state ── */
+    /* ── Expanded state (top-level) ── */
     .panels.expanded-1 { grid-template-columns: 1fr 2px 0fr; }
     .panels.expanded-2 { grid-template-columns: 0fr 2px 1fr; }
 
@@ -159,6 +161,7 @@
     .panels.expanded-1 .panel-1 .expanded-inner,
     .panels.expanded-2 .panel-2 .expanded-inner { display: flex; }
 
+    /* ── Title + text grid (Art panel, unchanged) ── */
     .title-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -190,6 +193,145 @@
 
     .text-full { font-size: 13px; line-height: 1.95; color: #666; font-weight: 300; }
 
+    /* ══════════════════════════════════════
+       PI EXPANDED  — two-section layout
+    ══════════════════════════════════════ */
+    .pi-expanded {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .pi-top {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 52px;
+      align-items: start;
+    }
+
+    /* ── ServiceFlow drawer ── */
+    .sf-drawer {
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition:
+        max-height 0.65s cubic-bezier(0.77,0,0.18,1) 0.3s,
+        opacity    0.45s ease 0.45s;
+    }
+
+    .pi-expanded.sf-open .sf-drawer {
+      max-height: 500px;
+      opacity: 1;
+    }
+
+    .sf-separator {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin-top: 40px;
+      margin-bottom: 0;
+    }
+
+    .sf-inner {
+      padding-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 52px;
+      align-items: start;
+    }
+
+    /* Tag above the product name */
+    .sf-eyebrow {
+      font-size: 8px;
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #bbb;
+      font-weight: 300;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .sf-eyebrow::before {
+      content: '';
+      display: block;
+      width: 16px; height: 2px;
+      background: #1a7a4a;
+      flex-shrink: 0;
+    }
+
+    .sf-title {
+      font-size: clamp(20px, 2.4vw, 26px);
+      font-weight: 700; letter-spacing: -0.03em;
+      color: #111; line-height: 1.05; text-transform: lowercase;
+      margin-bottom: 5px;
+    }
+    .sf-subtitle {
+      font-size: 10px; letter-spacing: 0.3em;
+      text-transform: uppercase; color: #aaa; font-weight: 300;
+      margin-bottom: 20px;
+    }
+    .sf-lead {
+      font-size: 13px; line-height: 1.7;
+      color: #aaa; font-weight: 300; font-style: italic;
+      margin-bottom: 20px;
+    }
+    .sf-lead strong { font-weight: 300; font-style: normal; color: #111; }
+
+    .sf-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .sf-features li {
+      display: flex;
+      gap: 12px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #666;
+      font-weight: 300;
+    }
+    .sf-features li::before {
+      content: '';
+      display: block;
+      width: 14px; height: 1px;
+      background: #1a7a4a;
+      margin-top: 10px;
+      flex-shrink: 0;
+    }
+    .sf-features strong { font-weight: 400; color: #111; }
+
+    .sf-step-label {
+      font-size: 8px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #bbb;
+      font-weight: 300;
+      margin-bottom: 14px;
+    }
+    .sf-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .sf-step {
+      display: flex;
+      gap: 14px;
+      font-size: 12px;
+      line-height: 1.6;
+      color: #666;
+      font-weight: 300;
+    }
+    .sf-step-num {
+      font-size: 8px;
+      letter-spacing: 0.15em;
+      color: #bbb;
+      padding-top: 2px;
+      flex-shrink: 0;
+      width: 18px;
+    }
+
+    /* ── Back button ── */
     .btn-back {
       font-size: 9px; letter-spacing: 0.32em;
       text-transform: uppercase; color: #bbb; font-weight: 300;
@@ -233,7 +375,9 @@
       .panels.expanded-2 .panel-1 { display: none; }
       .panels.expanded-1 .divider,
       .panels.expanded-2 .divider { display: none; }
+      .pi-top { grid-template-columns: 1fr; gap: 24px; }
       .title-row { grid-template-columns: 1fr; gap: 24px; }
+      .sf-inner { grid-template-columns: 1fr; gap: 24px; }
       .site-footer { padding: 14px 24px; margin-bottom: 48px; }
       .accent-blue { display: none; }
       .panel-title { height: auto; margin-bottom: 8px; }
@@ -257,8 +401,9 @@
 
   <main class="panels" id="panels">
 
-    <!-- Panel 1 -->
+    <!-- ── Panel 1: Process & Intelligence ── -->
     <div class="panel panel-1" onclick="expand(1)" role="button" tabindex="0" aria-label="Open Process and Intelligence">
+
       <div class="collapsed">
         <div class="panel-accent blue"></div>
         <div class="panel-title">Process &amp;<br>Intelligence</div>
@@ -270,26 +415,63 @@
 
       <div class="expanded-inner">
         <div class="panel-accent blue"></div>
-        <div class="title-row">
-          <div>
-            <div class="expanded-title">Process &amp;<br>Intelligence</div>
-            <div class="expanded-subtitle">Consulting · Data · AI</div>
-          </div>
-          <div class="text-right">
-            <div class="text-intro">We work where <strong>complexity asks for calm.</strong></div>
-            <div class="text-full">
-              Systems that move — water, information, decisions.<br><br>
-              Pumpolino brings deep technical fluency to industrial process consulting, paired with the clarity of modern data architecture and applied intelligence.
+
+        <div class="pi-expanded" id="pi-expanded">
+
+          <!-- Upper section: title + description -->
+          <div class="pi-top">
+            <div>
+              <div class="expanded-title">Process &amp;<br>Intelligence</div>
+              <div class="expanded-subtitle">Consulting · Data · AI</div>
+            </div>
+            <div class="text-right">
+              <div class="text-intro">We work where <strong>complexity asks for calm.</strong></div>
+              <div class="text-full">
+                Systems that move — water, information, decisions.<br><br>
+                Pumpolino brings deep technical fluency to industrial process consulting, paired with the clarity of modern data architecture and applied intelligence.
+              </div>
             </div>
           </div>
-        </div>
+
+          <!-- ServiceFlow: slides in below the description -->
+          <div class="sf-drawer">
+            <hr class="sf-separator">
+            <div class="sf-inner">
+
+              <div>
+                <div class="sf-eyebrow">Referenzprodukt</div>
+                <div class="sf-title">Pumpen<br>ServiceFlow</div>
+                <div class="sf-subtitle">Software · Service · Automation</div>
+                <div class="sf-lead">Eine Plattform, die <strong>Effizienz in Struktur verwandelt.</strong></div>
+                <ul class="sf-features">
+                  <li><div><strong>Zentrale Datenverwaltung</strong> — Servicehistorie und Produktanpassungen transparent auf einer Plattform.</div></li>
+                  <li><div><strong>Automatisierung</strong> — Proaktive Benachrichtigung bei anstehenden Serviceintervallen.</div></li>
+                  <li><div><strong>Ressourcenplanung</strong> — Optimale Zuweisung von Techniker:innen und Ersatzteilen per System.</div></li>
+                  <li><div><strong>Ausblick: FlowSales</strong> — Digitale Zwillinge und teilautomatisierte Angebotsgenerierung.</div></li>
+                </ul>
+              </div>
+
+              <div>
+                <div class="sf-step-label">Implementierung</div>
+                <div class="sf-steps">
+                  <div class="sf-step"><span class="sf-step-num">01</span><span>Analyse — Identifikation maßgeschneiderter Features und Definition der Geschäftsprozesse.</span></div>
+                  <div class="sf-step"><span class="sf-step-num">02</span><span>Konfiguration &amp; Migration — Datenmigration und Integration in bestehende Workflows.</span></div>
+                  <div class="sf-step"><span class="sf-step-num">03</span><span>Rollout — Schrittweise Implementierung inklusive Nutzerschulungen.</span></div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div><!-- end pi-expanded -->
+
         <button class="btn-back" onclick="collapse(event)">← Back</button>
       </div>
     </div>
 
     <div class="divider"></div>
 
-    <!-- Panel 2 -->
+    <!-- ── Panel 2: Art & Provenance ── -->
     <div class="panel panel-2" onclick="expand(2)" role="button" tabindex="0" aria-label="Open Art and Provenance">
       <div class="collapsed">
         <div class="panel-accent red"></div>
@@ -333,12 +515,20 @@
       if (current === n) return;
       current = n;
       document.getElementById('panels').className = 'panels expanded-' + n;
+
+      var piExp = document.getElementById('pi-expanded');
+      if (n === 1) {
+        setTimeout(function() { piExp.classList.add('sf-open'); }, 300);
+      } else {
+        piExp.classList.remove('sf-open');
+      }
     }
 
     function collapse(e) {
       e.stopPropagation();
       current = 0;
       document.getElementById('panels').className = 'panels';
+      document.getElementById('pi-expanded').classList.remove('sf-open');
     }
 
     document.querySelectorAll('.panel').forEach(function(panel) {
